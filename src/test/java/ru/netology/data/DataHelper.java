@@ -39,11 +39,15 @@ public class DataHelper {
         return new CardInfo("5559000000000002", "10000");
     }
 
-    public static int balanceOfFirstCardWhenTransferDone(int balance, int amount) {
-        return balance - amount;
+    public static int balanceMinusAmount(int balance, int amount) {
+        int BalanceMinus = balance - amount;
+        if (BalanceMinus < 0) {
+            return balance;
+        }
+        return BalanceMinus;
     }
 
-    public static int balanceOfSecondCardWhenTransferDone(int balance, int amount) {
+    public static int balancePlusAmount(int balance, int amount) {
         return balance + amount;
     }
 }

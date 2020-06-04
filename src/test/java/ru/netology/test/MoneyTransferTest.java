@@ -23,13 +23,13 @@ public class MoneyTransferTest {
         val verificationPage = loginPage.validLogin(authInfo);
         val verificationCode = DataHelper.getVerificationCodeFor(authInfo);
         val dashboardPage = verificationPage.validVerify(verificationCode);
-        int baianceOfFirstCardBegining = DashboardPage.getCurrentBalanceOfFirstCard();
-        int baianceOfSecondCardBegining = DashboardPage.getCurrentBalanceOfSecondCard();
+        int balanceOfFirstCardBegining = DashboardPage.getCurrentBalanceOfFirstCard();
+        int balanceOfSecondCardBegining = DashboardPage.getCurrentBalanceOfSecondCard();
         val transferPage = dashboardPage.firstCard();
         val cardinfo = DataHelper.getSecondCardInfo();
         transferPage.transferCard(cardinfo,amount);
-        int balanceAfterTransferFirstCard = DataHelper.balanceOfSecondCardWhenTransferDone(baianceOfFirstCardBegining, amount);
-        int balanceAfterTransferSecondCard = DataHelper.balanceOfFirstCardWhenTransferDone(baianceOfSecondCardBegining, amount);
+        int balanceAfterTransferFirstCard = DataHelper.balancePlusAmount(balanceOfFirstCardBegining, amount);
+        int balanceAfterTransferSecondCard = DataHelper.balanceMinusAmount(balanceOfSecondCardBegining, amount);
         int balanceOfFirstCardAfter = DashboardPage.getCurrentBalanceOfFirstCard();
         int balanceOfSecondCardAfter = DashboardPage.getCurrentBalanceOfSecondCard();
         assertEquals(balanceAfterTransferFirstCard, balanceOfFirstCardAfter);
@@ -50,13 +50,30 @@ public class MoneyTransferTest {
         val transferPage = dashboardPage.secondCard();
         val cardInfo = DataHelper.getFirstCardInfo();
         transferPage.transferCard(cardInfo,amount);
-        int balanceAfterTransferFirstCard = DataHelper.balanceOfSecondCardWhenTransferDone(balanceOfSecondCardBefore, amount);
-        int balanceAfterTransferSecondCard = DataHelper.balanceOfFirstCardWhenTransferDone(balanceOfFirstCardBefore, amount);
+        int balanceAfterTransferFirstCard = DataHelper.balancePlusAmount(balanceOfSecondCardBefore, amount);
+        int balanceAfterTransferSecondCard = DataHelper.balanceMinusAmount(balanceOfFirstCardBefore, amount);
         int balanceOfFirstCardAfter = DashboardPage.getCurrentBalanceOfSecondCard();
         int balanceOfSecondCardAfter = DashboardPage.getCurrentBalanceOfFirstCard();
         assertEquals(balanceAfterTransferFirstCard, balanceOfFirstCardAfter);
         assertEquals(balanceAfterTransferSecondCard, balanceOfSecondCardAfter);
     }
+/*
+    @Test
+    void shouldNotTransferMoreThanRestOfBalance() {
+        int amount = 15000;
+        val loginPage = open("http://localhost:9999", LoginPage.class);
+        val authInfo = DataHelper.getAuthInfo();
+        val verificationPage = loginPage.validLogin(authInfo);
+        val verificationCode = DataHelper.getVerificationCodeFor(authInfo);
+        val dashboardPage = verificationPage.validVerify(verificationCode);
+
+        val transferPage = dashboardPage.firstCard();
+        val cardInfo = DataHelper.getSecondCardInfo();
+        transferPage.transferCard(cardInfo, amount);
+        $(withText("На балансе недостаточно средств")).shouldBe(Condition.visible);
+    }
+
+ */
 
     @Test
     void shouldNotTransferMoreThanRestOfBalance() {
@@ -66,11 +83,18 @@ public class MoneyTransferTest {
         val verificationPage = loginPage.validLogin(authInfo);
         val verificationCode = DataHelper.getVerificationCodeFor(authInfo);
         val dashboardPage = verificationPage.validVerify(verificationCode);
-        int balanceOfFirstCardBefore = DashboardPage.getCurrentBalanceOfFirstCard();
-        int balanceOfSecondCardBefore = DashboardPage.getCurrentBalanceOfSecondCard();
+        int balanceOfFirstCardBegining = DashboardPage.getCurrentBalanceOfFirstCard();
+        int balanceOfSecondCardBegining = DashboardPage.getCurrentBalanceOfSecondCard();
         val transferPage = dashboardPage.firstCard();
-        val cardInfo = DataHelper.getSecondCardInfo();
-        transferPage.transferCard(cardInfo, amount);
-        $(withText("На балансе недостаточно средств")).shouldBe(Condition.visible);
+        val cardinfo = DataHelper.getSecondCardInfo();
+        transferPage.transferCard(cardinfo,amount);
+        int balanceAfterTransferFirstCard = DataHelper.balancePlusAmount(balanceOfFirstCardBegining, amount);
+        int balanceAfterTransferSecondCard = DataHelper.balanceMinusAmount(balanceOfSecondCardBegining, amount);
+        int balanceOfFirstCardAfter = DashboardPage.getCurrentBalanceOfFirstCard();
+        int balanceOfSecondCardAfter = DashboardPage.getCurrentBalanceOfSecondCard();
+        assertEquals(balanceAfterTransferFirstCard, balanceOfFirstCardAfter);
+        assertEquals(balanceAfterTransferSecondCard, balanceOfSecondCardAfter);
+
+
     }
 }
